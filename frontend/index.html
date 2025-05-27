@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API Site</title>
+    <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
+    <h1>Weather API Data:</h1>
+
+    <div id="main">
+        <form id="weatherForm">
+            <button type="submit">Send Request</button>
+            <input name="location" id="weatherInput" placeholder="enter city/place here">
+        </form>
+    </div>
+        <h1 id="result"></h1>
+    <script>
+        document.getElementById("weatherForm").addEventListener('submit', async function(event){
+            event.preventDefault();  
+            
+            const city = document.getElementById("weatherInput").value;
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/?location=${city}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    document.getElementById("result").textContent = `Temperature: ${data.temperature}`;
+                } else {
+                    // If something goes wrong with the request, show an error
+                    document.getElementById('result').textContent = "Error: Unable to fetch data.";
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = "Erorr. Network issue.";
+            }
+
+        });
+    </script>
+</body>
+</html>
+
+
