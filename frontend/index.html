@@ -16,6 +16,10 @@
         </form>
     </div>
         <h1 id="result"></h1>
+    <div style="width: 50vw; height: 50vw; justify-self: center;">
+        <canvas id="tempChart"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!--Allows use of Chart JS-->
     <script>
         document.getElementById("weatherForm").addEventListener('submit', async function(event){
             event.preventDefault();  
@@ -28,7 +32,62 @@
                 if (response.ok) {
                     const data = await response.json();
                     
-                    document.getElementById("result").textContent = `Temperature: ${data.temperature}`;
+                    const hourly = data.hourly;
+                    const hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+                    document.getElementById("result").textContent = `Current Temp: ${data.current}`;
+                    const ctx = document.getElementById("tempChart").getContext('2d');
+
+                    if (window.tempChart instanceof Chart) {
+                        window.tempChart.destroy();
+                    }
+
+                    
+                    window.tempChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                        labels: hours,
+                        datasets: [{
+                            label: 'Temperature (°F)',
+                            data: hourly,
+                            borderColor: '#6A9C89',
+                            backgroundColor: 'rgba(193, 216, 195, 0.5)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                        },
+                        options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            title: {
+                            display: true,
+                            text: 'Hourly Temperature on June 1, 2025 (Paris)'
+                            },
+                            legend: {
+                            display: true
+                            }
+                        },
+                        scales: {
+                            x: {
+                            title: {
+                                display: true,
+                                text: 'Hour'
+                            }
+                            },
+                            y: {
+                            title: {
+                                display: true,
+                                text: 'Temperature (°F)'
+                            },
+                            beginAtZero: false
+                            }
+                        }
+                        }
+                    });
+
+                    
                 } else {
                     // If something goes wrong with the request, show an error
                     document.getElementById('result').textContent = "Error: Unable to fetch data.";

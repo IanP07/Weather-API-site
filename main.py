@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import requests
+import time
 
 app = FastAPI()
 
@@ -19,7 +20,17 @@ def return_data(location: str):
     response = requests.get(key)
 
     if response.status_code == 200:
+        # Grabbing hourly data
         data = response.json()
-        return {"temperature": data['days'][0]['temp']}
+        hourly = data['days'][0]['hours']
+        hourly_temp = []
+        for hour in hourly:
+            hourly_temp.append(hour['temp'])
+        
+        # Calculating current time
+        local_time = time.localtime().tm_hour
+        local_current_weather = data['days'][0]['hours'][local_time]['temp']
+
+        return {"hourly": hourly_temp, "current": local_current_weather}
     else:
         return {"error": "unable to find location"}
